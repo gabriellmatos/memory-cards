@@ -17,26 +17,27 @@ let currentActiveCard = 0;
 const cardsEl = [];
 
 // Store card data
-const cardData = [
-	{
-		question: 'What must a variable begin with?',
-		answer: 'A letter, $ or _',
-	},
-	{
-		question: 'What is a variable?',
-		answer: 'Container for a piece of data.',
-	},
-	{
-		question: 'Example of case sensitive variable?',
-		answer: 'thisIsAVariable',
-	},
-];
+const cardsData = getCardsData();
+// const cardData = [
+// 	{
+// 		question: 'What must a variable begin with?',
+// 		answer: 'A letter, $ or _',
+// 	},
+// 	{
+// 		question: 'What is a variable?',
+// 		answer: 'Container for a piece of data.',
+// 	},
+// 	{
+// 		question: 'Example of case sensitive variable?',
+// 		answer: 'thisIsAVariable',
+// 	},
+// ];
 
 createCards();
 
 // Create all cards
 function createCards() {
-	cardData.forEach((data, index) => createCard(data, index));
+	cardsData.forEach((data, index) => createCard(data, index));
 }
 
 // Create a single card in the DOM
@@ -74,6 +75,18 @@ function updateCurrentText() {
     `;
 }
 
+// Get Cards from Local Storage
+function getCardsData() {
+	const cards = JSON.parse(localStorage.getItem('cards'));
+	return cards === null ? [] : cards;
+}
+
+// Set Cards to Local Storage
+function setCardsData(cards) {
+	localStorage.setItem('cards', JSON.stringify(cards));
+	window.location.reload();
+}
+
 // Event Listeners
 nextBtn.addEventListener('click', () => {
 	cardsEl[currentActiveCard].className = 'card left';
@@ -95,4 +108,30 @@ prevBtn.addEventListener('click', () => {
 
 	cardsEl[currentActiveCard].className = 'card active';
 	updateCurrentText();
+});
+
+showBtn.addEventListener('click', () => addContainer.classList.add('show'));
+hideBtn.addEventListener('click', () => addContainer.classList.remove('show'));
+
+addCardBtn.addEventListener('click', () => {
+	const question = questionEl.value;
+	const answer = answerEl.value;
+
+	if (question.trim() && answer.trim()) {
+		const newCard = { question, answer };
+		createCard(newCard);
+		questionEl.value = '';
+		answerEl.value = '';
+
+		addContainer.classList.remove('show');
+
+		cardsData.push(newCard);
+		setCardsData(cardsData);
+	}
+});
+
+clearBtn.addEventListener('click', () => {
+	localStorage.clear();
+	cardsContainer.innerHTML = '';
+	window.location.reload();
 });
